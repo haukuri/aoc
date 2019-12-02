@@ -188,8 +188,6 @@ def test_evaluate(initial_state, expected_halt_state):
     halt_state = evaluate(initial_state)
     assert halt_state == expected_halt_state
 
-
-
 def main():
     program = load_program()
     print('1202 output', program(12, 2))
