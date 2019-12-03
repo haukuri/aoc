@@ -44,4 +44,76 @@ these together produces a checksum of 4 * 3 = 12.
 
 What is the checksum for your list of box IDs?
 
+--- Part Two ---
+
+Confident that your list of box IDs is complete, you're ready to find the boxes
+full of prototype fabric.
+
+The boxes will have IDs which differ by exactly one character at the same
+position in both strings. For example, given the following box IDs:
+
+abcde
+fghij
+klmno
+pqrst
+fguij
+axcye
+wvxyz
+
+The IDs abcde and axcye are close, but they differ by two characters (the second
+and fourth). However, the IDs fghij and fguij differ by exactly one character,
+the third (h and u). Those must be the correct boxes.
+
+What letters are common between the two correct box IDs? (In the example above,
+this is found by removing the differing character from either ID, producing
+fgij.)
+
 """
+
+from collections import Counter
+
+import pytest
+
+def checksum(ids):
+    count_counter = Counter()
+    for box_id in ids:
+        digit_counter = Counter(box_id)
+        digit_counts = {v for v in digit_counter.values() if v > 1}
+        count_counter.update(digit_counts)
+    acc = 1
+    for count in count_counter.values():
+        acc *= count
+    return acc
+
+
+@pytest.mark.parametrize(
+    'ids, expected_checksum',
+    [
+        (
+            (
+                "abcdef",
+                "bababc",
+                "abbcde",
+                "abcccd",
+                "aabcdd",
+                "abcdee",
+                "ababab"
+            ),
+            12
+        )
+    ]
+)
+def test_checksum(ids, expected_checksum):
+    actual = checksum(ids)
+    assert actual == expected_checksum
+
+def main():
+    import pathlib
+    
+    input_file = pathlib.Path(__file__).parent / 'd02input'
+    ids = input_file.open().readlines()
+    chk = checksum(ids)
+    print('Checksum:', chk)
+
+if __name__ == '__main__':
+    main()
