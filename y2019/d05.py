@@ -97,3 +97,133 @@ After providing 1 to the only input instruction and passing all the tests, what
 diagnostic code does the program produce?
 
 """
+
+from collections import deque
+from dataclasses import dataclass
+from typing import List, Tuple, Callable, Mapping
+from enum import IntEnum
+
+from utils import read_csv_input
+
+class Mode(IntEnum):
+    POSITION = 0
+    IMMEDIATE = 1
+
+class Opcode(IntEnum):
+    ADD = 1
+    MULTIPLY = 2
+    READ_INPUT = 3
+    WRITE_OUTPUT = 4
+    HALT = 99
+
+@dataclass
+class Instruction:
+    opcode: Opcode
+    modes: Tuple[Mode]
+
+    @staticmethod
+    def decode(instruction: int) -> 'Instruction':
+        a = instruction // 10_000
+        rest = instruction % 10_000
+        b = rest // 1_000
+        rest = rest % 1_000
+        c = rest // 100
+        opcode = Opcode(rest % 100)
+        modes = (Mode(c), Mode(b), Mode(a))
+        return Instruction(opcode=opcode, modes=modes)
+
+def test_instruction_decode():
+    input = 1002
+    expected = Instruction(
+        opcode=Opcode.MULTIPLY, 
+        modes=(Mode.POSITION, Mode.IMMEDIATE, Mode.POSITION))
+    actual = Instruction.decode(input)
+    assert actual == expected
+
+class HaltExecution(Exception):
+    pass
+
+class Computer:
+    memory: List[int]
+    pc: int
+    input: deque
+    output: List[int]
+
+    def load(self, address: int, mode: Mode):
+        value = self.memory[address]
+        if (mode == Mode.IMMEDIATE):
+            return value
+        elif (mode == Mode.POSITION):
+            return self.memory[value]
+        else:
+            raise ValueError('Invalid mode', mode)
+
+    def store(self, value: int, address: int, mode: Mode):
+        if (mode == Mode.IMMEDIATE):
+            self.memory[address] = value
+        elif (mode == Mode.POSITION):
+            pointer = self.memory[address]
+            self.memory[pointer] = value
+
+    def evaluate(self, program: List[int], input=None):
+        self.pc = 0
+        self.memory = list(program)
+        self.input = deque(input) if input else deque()
+        self.output = list()
+        while True:
+            try:
+                instruction = Instruction.decode(self.memory[self.pc])
+                self.handle(instruction)
+            except HaltExecution:
+                break
+    
+    def handle(self, instruction: Instruction):
+        opcode = instruction.opcode
+        print(opcode.name)
+        opcode_name = opcode.name.lower()
+        handler = getattr(self, f'handle_{opcode_name}')
+        handler(instruction)
+    
+    def handle_add(self, instruction: Instruction):
+        a_mode, b_mode, r_mode  = instruction.modes
+        a = self.load(self.pc+1, a_mode)
+        b = self.load(self.pc+2, b_mode)
+        r = a + b
+        self.store(r, self.pc+3, r_mode)
+        self.pc += 4
+    
+    def handle_multiply(self, instruction: Instruction):
+        a_mode, b_mode, r_mode  = instruction.modes
+        a = self.load(self.pc+1, a_mode)
+        b = self.load(self.pc+2, b_mode)
+        r = a * b
+        self.store(r, self.pc+3, r_mode)
+        self.pc += 4
+    
+    def handle_read_input(self, instruction: Instruction):
+        value = self.input.popleft()
+        mode = instruction.modes[0]
+        self.store(value, self.pc+1, mode)
+        self.pc += 2
+    
+    def handle_write_output(self, instruction: Instruction):
+        mode = instruction.modes[0]
+        value = self.load(self.pc+1, mode)
+        self.output.append(value)
+        self.pc += 2
+
+    def handle_halt(self, instruction: Instruction):
+        raise HaltExecution
+
+def main():
+    input_data = read_csv_input('d05input')
+    program = input_data[0]
+    print(input_data)
+    computer = Computer()
+    input = [1]
+    computer.evaluate(program, input=input)
+    print(computer.output)
+
+
+if __name__ == "__main__":
+    main()

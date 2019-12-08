@@ -48,14 +48,7 @@ import math
 
 import pytest
 
-def digits(number):
-    scale = math.floor(math.log10(number))
-    remainder = number
-    for power in range(scale, -1, -1):
-        decimal = 10**power
-        component = remainder // decimal
-        yield component
-        remainder = remainder % decimal
+from .utils import digits
 
 def collect(sequence):
     it = iter(sequence)
@@ -87,14 +80,6 @@ def has_increasing_digits(number):
             return False
         last_digit = digit
     return True
-
-@pytest.mark.parametrize(
-    'number, expected',
-    [(123257, (1,2,3,2,5,7)), (647016, (6,4,7,0,1,6))]
-)
-def test_digits(number, expected):
-    actual = tuple(digits(number))
-    assert actual == expected
 
 @pytest.mark.parametrize(
     'number, expected',
