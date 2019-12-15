@@ -223,6 +223,108 @@ def test_instruction_decode():
 class HaltExecution(Exception):
     pass
 
+class IntComputer:
+    memory: List[int]
+    pc: int
+    opcode: Opcode
+    modes: Tuple[Mode]
+
+    def __init__(self, program, debug=False):
+        self.memory = list(program)
+        self.debug = bool(debug)
+        self.pc = 0
+        self.opcode = Opcode.HALT
+        self.modes = (Mode.IMMEDIATE, Mode.IMMEDIATE, Mode.IMMEDIATE)
+
+    def decode(self):
+        instruction = self.memory[self.pc]
+        a = instruction // 10_000
+        rest = instruction % 10_000
+        b = rest // 1_000
+        rest = rest % 1_000
+        c = rest // 100
+        self.opcode = Opcode(rest % 100)
+        self.modes = (Mode(c), Mode(b), Mode(a))
+        if self.debug:
+            print(self.pc, self.opcode.name, *(m.name for m in self.modes))
+
+    def load(self, offset: int) -> int:
+        address = self.pc + offset
+        value = self.memory[address]
+        mode = self.modes[offset-1]
+        if (mode == Mode.IMMEDIATE):
+            return value
+        elif (mode == Mode.POSITION):
+            return self.memory[value]
+        else:
+            raise ValueError('Invalid mode', mode)
+
+    def store(self, offset: int, value: int) -> None:
+        address = self.pc + offset
+        mode = self.modes[offset-1]
+        if (mode == Mode.IMMEDIATE):
+            self.memory[address] = value
+        elif (mode == Mode.POSITION):
+            pointer = self.memory[address]
+            self.memory[pointer] = value
+
+    def evaluate(self, input=None):
+        self.pc = 0
+        output = []
+        halt = False
+        input = deque(input) if input else deque()
+        while not halt:
+            self.decode()
+            if self.opcode == Opcode.ADD:
+                a = self.load(1)
+                b = self.load(2)
+                c = a + b
+                self.store(3, c)
+                self.pc += 4
+            elif self.opcode == Opcode.MULTIPLY:
+                a = self.load(1)
+                b = self.load(2)
+                c = a * b
+                self.store(3, c)
+                self.pc += 4
+            elif self.opcode == Opcode.READ_INPUT:
+                c = input.popleft()
+                self.store(1, c)
+                self.pc += 2
+            elif self.opcode == Opcode.WRITE_OUTPUT:
+                a = self.load(1)
+                output.append(a)
+                self.pc += 2
+            elif self.opcode == Opcode.JUMP_IF_TRUE:
+                a = self.load(1)
+                if a:
+                    b = self.load(2)
+                    self.pc = b
+                self.pc += 3
+            elif self.opcode == Opcode.JUMP_IF_FALSE:
+                a = self.load(1)
+                if not a:
+                    b = self.load(2)
+                    self.pc = b
+                self.pc += 3
+            elif self.opcode == Opcode.LESS_THAN:
+                a = self.load(1)
+                b = self.load(2)
+                c = int(a < b)
+                self.store(3, c)
+                self.pc += 4
+            elif self.opcode == Opcode.EQUALS:
+                a = self.load(1)
+                b = self.load(2)
+                c = int(a == b)
+                self.store(3, c)
+                self.pc += 4
+            elif self.opcode == Opcode.HALT:
+                halt = True
+            else:
+                raise ValueError('Unknown opcode', self.opcode)
+        return output
+
 class Computer:
     memory: List[int]
     pc: int
@@ -327,23 +429,37 @@ class Computer:
     def handle_halt(self, modes: Tuple[Mode]):
         raise HaltExecution
 
+def evaluate_part1():
+    input_data = read_csv_input('d05input')
+    program = input_data[0]
+    input = [1]
+    
+    # computer = Computer()
+    # computer.evaluate(program, input=input)
+    # result_value = computer.output[-1]
+    
+    computer = IntComputer(program=program, debug=True)
+    output = computer.evaluate(input)
+    result_value = output[-1]
+    return result_value
+
+def test_part1():
+    actual = evaluate_part1()
+    assert actual == 16489636
+
 def test_computer():
     program = [
         3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
         1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
         999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99]
     input = [7]
-    computer = Computer()
-    computer.evaluate(program, input=input)
-    assert computer.output[0] == 999
+    computer = IntComputer(program)
+    output = computer.evaluate(input)
+    assert output[0] == 999
 
 def main():
-    input_data = read_csv_input('d05input')
-    program = input_data[0]
-    computer = Computer()
-    input = [1]
-    computer.evaluate(program, input=input)
-    print(computer.output)
+    part1_output = evaluate_part1()
+    print(part1_output) # 16489636
 
 
 if __name__ == "__main__":
