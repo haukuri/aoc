@@ -179,6 +179,8 @@ from dataclasses import dataclass
 from typing import List, Tuple, Callable, Mapping
 from enum import IntEnum
 
+import pytest
+
 from .utils import read_csv_input
 
 class Mode(IntEnum):
@@ -195,6 +197,7 @@ class Opcode(IntEnum):
     LESS_THAN = 7
     EQUALS = 8
     HALT = 99
+
 
 @dataclass
 class Instruction:
@@ -238,13 +241,13 @@ class IntComputer:
 
     def decode(self):
         instruction = self.memory[self.pc]
-        a = instruction // 10_000
+        c = instruction // 10_000
         rest = instruction % 10_000
         b = rest // 1_000
         rest = rest % 1_000
-        c = rest // 100
+        a = rest // 100
         self.opcode = Opcode(rest % 100)
-        self.modes = (Mode(c), Mode(b), Mode(a))
+        self.modes = (Mode(a), Mode(b), Mode(c))
         if self.debug:
             print(self.pc, self.opcode.name, *(m.name for m in self.modes))
 
@@ -300,13 +303,15 @@ class IntComputer:
                 if a:
                     b = self.load(2)
                     self.pc = b
-                self.pc += 3
+                else:
+                    self.pc += 3
             elif self.opcode == Opcode.JUMP_IF_FALSE:
                 a = self.load(1)
                 if not a:
                     b = self.load(2)
                     self.pc = b
-                self.pc += 3
+                else:
+                    self.pc += 3
             elif self.opcode == Opcode.LESS_THAN:
                 a = self.load(1)
                 b = self.load(2)
@@ -324,6 +329,18 @@ class IntComputer:
             else:
                 raise ValueError('Unknown opcode', self.opcode)
         return output
+
+@pytest.mark.parametrize(
+    'instruction, opcode, modes',
+    [
+        (1101, Opcode.ADD, (Mode.IMMEDIATE, Mode.IMMEDIATE, Mode.POSITION))
+    ]
+)
+def test_intcomputer_decode(instruction, opcode, modes):
+    instance = IntComputer(program=[instruction, 1, 1, 0])
+    instance.decode()
+    assert instance.opcode == opcode
+    assert instance.modes == modes
 
 class Computer:
     memory: List[int]
