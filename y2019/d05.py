@@ -342,23 +342,23 @@ def test_intcomputer_decode(instruction, opcode, modes):
     assert instance.opcode == opcode
     assert instance.modes == modes
 
-def evaluate_part1():
+def run_diagnostics(system_id):
     input_data = read_csv_input('d05input')
     program = input_data[0]
-    input = [1]
+    input = [system_id]
     
-    # computer = Computer()
-    # computer.evaluate(program, input=input)
-    # result_value = computer.output[-1]
-    
-    computer = IntComputer(program=program, debug=True)
+    computer = IntComputer(program=program, debug=False)
     output = computer.evaluate(input)
     result_value = output[-1]
     return result_value
 
 def test_part1():
-    actual = evaluate_part1()
+    actual = run_diagnostics(1)
     assert actual == 16489636
+
+def test_part2():
+    actual = run_diagnostics(5)
+    assert actual == 9386583
 
 def test_computer():
     program = [
@@ -371,8 +371,11 @@ def test_computer():
     assert output[0] == 999
 
 def main():
-    part1_output = evaluate_part1()
+    part1_output = run_diagnostics(1)
     print(part1_output) # 16489636
+
+    part2_output = run_diagnostics(5)
+    print(part2_output) # 9386583
 
 
 if __name__ == "__main__":
