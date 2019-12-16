@@ -135,14 +135,15 @@ import pathlib
 import collections
 from pprint import pprint
 
-
-
-def count_orbits(filename):
+def parse_input(filename):
     input_path = pathlib.Path(__file__).parent / filename
     orbits = {}
     for line in input_path.open('r').readlines():
         a, b = line.strip().split(')')
         orbits[b] = a
+    return orbits
+
+def count_orbits(orbits):
     pairs = set()
     for orbiter, orbitee in orbits.items():
         while orbitee:
@@ -150,13 +151,69 @@ def count_orbits(filename):
             orbitee = orbits.get(orbitee, None)
     return len(pairs)
 
+def fewest_transfers(orbits, origin, destination):
+    # Build a bidirectional gratph
+    neighbors = collections.defaultdict(set)
+    for orbiter, orbitee in orbits.items():
+        neighbors[orbiter].add(orbitee)
+        neighbors[orbitee].add(orbiter)
+    
+    # Breadth first distance measure from origin to every planet/body
+    ingres = { origin: origin}
+    frontier = { origin }
+    while frontier:
+        next_frontier = set()
+        # Expand frontier
+        for f in frontier:
+            for n in neighbors[f]:
+                if n in ingres:
+                    continue
+                ingres[n] = f
+                next_frontier.add(n)
+        frontier = next_frontier
+
+    # Track back from destination to origin
+    current = destination
+    path = []
+    while current != origin:
+        next_step = ingres[current]
+        path.append((next_step, current))
+        current = next_step
+    
+    # Reverse path segment list to get the path from origin to destination
+    path.reverse()
+    return path
+
 def test_count_orbits():
-    actual = count_orbits('d06input.test')
-    assert actual == 42
+    orbits = parse_input('d06input.test')
+    num_orbits = count_orbits(orbits)
+    assert num_orbits == 42
+
+def test_part1():
+    orbits = parse_input('d06input')
+    num_orbits = count_orbits(orbits)
+    assert num_orbits == 194721
+
+def test_fewest_transfers():
+    orbits = parse_input('d06input.test2')
+    origin = orbits['YOU']
+    destination = orbits['SAN']
+    actual = fewest_transfers(orbits, origin, destination)
+    exepected = [
+        ('K', 'J'), ('J', 'E'), ('E', 'D'), ('D', 'I')
+    ]
+    assert actual == exepected
 
 def main():
-    num_orbits = count_orbits('d06input')
-    print('Number of orbits:', num_orbits) # 194721
+    orbits = parse_input('d06input')
+    num_orbits = count_orbits(orbits)
+    print('Number of orbits (Part I):', num_orbits) # 194721
+
+    origin = orbits['YOU']
+    destination = orbits['SAN']
+    path = fewest_transfers(orbits, origin, destination)
+    num_transfers = len(path)
+    print('Minimum number of orbital transfers (Part II):', num_transfers)
 
 if __name__ == "__main__":
     main()
