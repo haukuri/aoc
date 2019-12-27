@@ -85,9 +85,11 @@ class IntComputer:
             pointer = self.memory[address]
             self.memory[pointer] = value
 
-    def evaluate(self, program=None, input=None) -> List[int]:
-        self.pc = 0
+    def load_program(self, program):
         self.memory = list(program) if program else []
+
+    def evaluate(self, input=None) -> List[int]:
+        self.pc = 0
         input = deque(input) if input else deque()
         output = []
         halt = False
