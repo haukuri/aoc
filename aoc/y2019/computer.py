@@ -1,6 +1,7 @@
+import asyncio
 from collections import deque
 from dataclasses import dataclass
-from typing import List, Tuple, Callable, Mapping
+from typing import List, Tuple, Callable, Mapping, Awaitable
 from enum import IntEnum
 
 import pytest
@@ -46,12 +47,18 @@ class IntComputer:
     pc: int
     opcode: Opcode
     modes: Tuple[Mode]
+    input: asyncio.Queue
+    output: asyncio.Queue
 
-    def __init__(self, debug=False):
+    def __init__(self, debug=False, input=None, output=None, program=None):
         self.debug = bool(debug)
         self.pc = 0
         self.opcode = Opcode.HALT
         self.modes = (Mode.IMMEDIATE, Mode.IMMEDIATE, Mode.IMMEDIATE)
+        self.input = input if input else asyncio.Queue()
+        self.output = output if output else asyncio.Queue()
+        if program:
+            self.load_program(program)
 
     def decode(self):
         instruction = self.memory[self.pc]
@@ -88,11 +95,12 @@ class IntComputer:
     def load_program(self, program):
         self.memory = list(program) if program else []
 
-    def evaluate(self, input=None) -> List[int]:
+    async def evaluate(self, input=None) -> List[int]:
         self.pc = 0
-        input = deque(input) if input else deque()
-        output = []
         halt = False
+        if input:
+            for item in input:
+                await self.input.put(item)
         while not halt:
             self.decode()
             if self.opcode == Opcode.ADD:
@@ -108,12 +116,12 @@ class IntComputer:
                 self.store(3, c)
                 self.pc += 4
             elif self.opcode == Opcode.READ_INPUT:
-                c = input.popleft()
+                c = await self.input.get()
                 self.store(1, c)
                 self.pc += 2
             elif self.opcode == Opcode.WRITE_OUTPUT:
                 a = self.load(1)
-                output.append(a)
+                await self.output.put(a)
                 self.pc += 2
             elif self.opcode == Opcode.JUMP_IF_TRUE:
                 a = self.load(1)
@@ -145,4 +153,3 @@ class IntComputer:
                 halt = True
             else:
                 raise ValueError('Unknown opcode', self.opcode)
-        return output

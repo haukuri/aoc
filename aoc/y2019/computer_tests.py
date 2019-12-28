@@ -2,6 +2,7 @@ from .computer import IntComputer, Opcode, Mode
 
 import pytest
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     'initial_state, expected_halt_state',
     [
@@ -10,10 +11,10 @@ import pytest
         ([2,4,4,5,99,0], [2,4,4,5,99,9801]),
         ([1,1,1,4,99,5,6,0,99], [30,1,1,4,2,5,6,0,99])
     ])
-def test_evaluate(initial_state, expected_halt_state):
+async def test_evaluate(initial_state, expected_halt_state):
     computer = IntComputer()
     computer.load_program(initial_state)
-    computer.evaluate()
+    await computer.evaluate()
     halt_state = computer.memory
     assert halt_state == expected_halt_state
 
