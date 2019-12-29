@@ -19,7 +19,17 @@ def split_layers(image, height, width):
 
 def print_layer(layer, height, width):
     for row in segment(width, layer):
-        print(*row, sep='')
+        rendered_row = ['\u2588' if cell else ' ' for cell in row]
+        print(*rendered_row, sep='')
+
+def collapse_layers(layers):
+    TRANSPARENT = 2
+    collapsed = list(layers[0])
+    for layer in layers[1:]:
+        for i in range(len(collapsed)):
+            if collapsed[i] == TRANSPARENT:
+                collapsed[i] = layer[i]
+    return collapsed
 
 
 def main():
@@ -30,10 +40,12 @@ def main():
     for layer in layers:
         counts = Counter(layer)
         if counts[0] <= picked[0]:
-            print(counts)
             picked = counts
     checksum = picked[1] * picked[2]
     print('Checksum', checksum)
+
+    collapsed = collapse_layers(layers)
+    print_layer(collapsed, 6, 25)
 
 if __name__ == '__main__':
     main()
