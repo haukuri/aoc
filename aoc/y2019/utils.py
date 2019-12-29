@@ -20,10 +20,14 @@ def test_digits(number, expected):
     actual = tuple(digits(number))
     assert actual == expected
 
-def read_csv_input(filename: str):
+def open_input(filename: str):
     path = pathlib.Path(__file__).parent / filename
+    return path.open()
+
+def read_csv_input(filename: str):
+    input_buffer = open_input(filename)
     output = []
-    for line in path.open().readlines():
+    for line in input_buffer.readlines():
         row = [int(value) for value in line.split(',')]
         output.append(row)
     return output
