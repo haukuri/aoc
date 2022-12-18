@@ -40,6 +40,22 @@ def solve_part_1(input: str):
         total_value += misplaced_type_value
     return total_value
 
+def solve_part_2(input: str):
+    batch = []
+    total_value = 0
+    for i, line in enumerate(input.splitlines()):
+        bag = set(line)
+        batch.append(bag)
+        if (i+1) % 3 == 0:
+            a, b, c = batch
+            common = a & b & c
+            assert len(common) == 1
+            common_type = next(iter(common))
+            common_type_value = type_value(common_type)
+            total_value += common_type_value
+            batch = []
+    return total_value
+
 
 def test_find_misplaced_item_type():
     assert find_misplaced_item_type("vJrwpWtwJgWrhcsFMMfFFhFp") == "p"
@@ -59,3 +75,10 @@ def test_part_1_example():
 def test_part_1_actual():
     input = utils.read_text("d03input.txt")
     assert solve_part_1(input) == 7553
+
+def test_part_2_example():
+    assert solve_part_2(example_input) == 70
+
+def test_part_2_actual():
+    input = utils.read_text("d03input.txt")
+    assert solve_part_2(input) == 2758
