@@ -86,6 +86,23 @@ def solve_part_1(input: str) -> int:
         total += size
     return total
 
+def solve_part_2(input: str) -> int:
+    total_space = 70_000_000
+    needed_space = 30_000_000
+    files = parse_input(input)
+    dir_size = measure_dir_sizes(files)
+    used_space = dir_size[("",)]
+    free_space = total_space - used_space
+    target = needed_space - free_space
+    sorted_sizes = [
+        (size, dir_path) for dir_path, size in dir_size.items()
+    ]
+    sorted_sizes.sort()
+    for size, dir_path in sorted_sizes:
+        if size >= target:
+            return size
+    return None
+
 def test_parse_input():
     expected = [
         File(path=("", "a", "e", "i"), size=584),
@@ -112,3 +129,12 @@ def test_solve_part_1_actual():
     input = utils.read_text("d07input.txt")
     actual = solve_part_1(input)
     assert actual == 1749646
+
+def test_solve_part_2_example():
+    actual = solve_part_2(example_input)
+    assert actual == 24933642
+
+def test_solve_part_2_actual():
+    input = utils.read_text("d07input.txt")
+    actual = solve_part_2(input)
+    assert actual == 1498966
