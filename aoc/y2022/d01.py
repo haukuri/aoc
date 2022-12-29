@@ -57,7 +57,7 @@ def test_example_part_2():
     assert solve_part_2(example_input) == 45_000
 
 def run():
-    input_path = pathlib.Path(__file__).parent / "d01input.txt"
+    input_path = pathlib.Path(__file__).parent / "d01_input.txt"
     input_text = input_path.read_text()
     output_1 = solve_part_1(input_text)
     print("Part 1", output_1)

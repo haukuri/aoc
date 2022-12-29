@@ -102,7 +102,7 @@ def test_solve_part_1_example():
     assert solve_part_1(example_input) == 21
 
 def test_solve_part_1_actual():
-    actual_input = utils.read_text("d08input.txt")
+    actual_input = utils.read_text("d08_input.txt")
     assert solve_part_1(actual_input) == 1845
 
 def test_viewing_distance_a():
@@ -127,5 +127,5 @@ def test_solve_part_2_example():
     assert solve_part_2(example_input) == 8
 
 def test_solve_part_2_actual():
-    actual_input = utils.read_text("d08input.txt")
+    actual_input = utils.read_text("d08_input.txt")
     assert solve_part_2(actual_input) == 230112

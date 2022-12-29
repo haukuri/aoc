@@ -189,7 +189,7 @@ def test_solve_part_1_example():
     assert solve_part_1(example_input) == "CMZ"
 
 def test_solve_part_1_actual():
-    input = utils.read_text("d05input.txt")
+    input = utils.read_text("d05_input.txt")
     actual = solve_part_1(input)
     assert actual == "FZCMJCRHZ"
 
@@ -197,6 +197,6 @@ def test_solve_part_2_example():
     assert solve_part_2(example_input) == "MCD"
 
 def test_solve_part_2_actual():
-    input = utils.read_text("d05input.txt")
+    input = utils.read_text("d05_input.txt")
     actual = solve_part_2(input)
     assert actual == "JSDHQMZGF"

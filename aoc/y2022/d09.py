@@ -131,7 +131,7 @@ def test_solve_part_1_example_a():
     assert solve_part_1(example_input_a) == 13
 
 def test_solve_part_1_actual():
-    actual_input = utils.read_text("d09input.txt")
+    actual_input = utils.read_text("d09_input.txt")
     assert solve_part_1(actual_input) == 6332
 
 def test_solve_part_2_example_a():
@@ -141,5 +141,5 @@ def test_solve_part_2_example_b():
     assert solve_part_2(example_input_b) == 36
 
 def test_solve_part_2_actual():
-    actual_input = utils.read_text("d09input.txt")
+    actual_input = utils.read_text("d09_input.txt")
     assert solve_part_2(actual_input) == 2511

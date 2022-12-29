@@ -59,12 +59,12 @@ def test_part_1_example():
     assert solve_part_1(example_input) == 2
 
 def test_part_1_actual():
-    input = utils.read_text("d04input.txt")
+    input = utils.read_text("d04_input.txt")
     assert solve_part_1(input) == 487
 
 def test_part_2_example():
     assert solve_part_2(example_input) == 4
 
 def test_part_2_actual():
-    input = utils.read_text("d04input.txt")
+    input = utils.read_text("d04_input.txt")
     assert solve_part_2(input) == 849

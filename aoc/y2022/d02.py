@@ -95,7 +95,7 @@ def test_part_1_example():
     assert result == 15
 
 def test_part_1_actual():
-    input = utils.read_text("d02input.txt")
+    input = utils.read_text("d02_input.txt")
     result = solve_part_1(input)
     assert result == 14375
 
@@ -104,6 +104,6 @@ def test_part_2_example():
     assert result == 12
 
 def test_part_2_actual():
-    input = utils.read_text("d02input.txt")
+    input = utils.read_text("d02_input.txt")
     result = solve_part_2(input)
     assert result == 10274

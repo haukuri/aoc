@@ -126,7 +126,7 @@ def test_solve_part_1_example():
     assert actual == expected
 
 def test_solve_part_1_actual():
-    input = utils.read_text("d07input.txt")
+    input = utils.read_text("d07_input.txt")
     actual = solve_part_1(input)
     assert actual == 1749646
 
@@ -135,6 +135,6 @@ def test_solve_part_2_example():
     assert actual == 24933642
 
 def test_solve_part_2_actual():
-    input = utils.read_text("d07input.txt")
+    input = utils.read_text("d07_input.txt")
     actual = solve_part_2(input)
     assert actual == 1498966
