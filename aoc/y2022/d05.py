@@ -3,7 +3,7 @@ import re
 from collections import namedtuple
 from typing import Mapping
 
-import utils
+from . import utils
 
 
 example_input = """

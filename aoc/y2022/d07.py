@@ -1,6 +1,6 @@
 import dataclasses
 
-import utils
+from . import utils
 
 example_input = """$ cd /
 $ ls

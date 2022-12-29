@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-import utils
+from . import utils
 
 example_input = """30373
 25512

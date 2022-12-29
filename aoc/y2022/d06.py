@@ -1,6 +1,6 @@
 import pytest
 
-import utils
+from . import utils
 
 examples_part_1 = [
     ("bvwbjplbgvbhsrlpgdmjqwftvncz", 5),

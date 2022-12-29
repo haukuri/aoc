@@ -1,6 +1,6 @@
 import enum
 
-import utils
+from . import utils
 
 Move = enum.Enum("Move", ["ROCK", "PAPER", "SCISSORS"])
 Strategy = tuple[Move, Move]

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-import utils
+from . import utils
 
 example_input_a = """R 4
 U 4

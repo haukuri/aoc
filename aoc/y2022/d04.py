@@ -1,4 +1,4 @@
-import utils
+from . import utils
 
 example_input = """
 2-4,6-8
