@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Sequence
 
 from . import utils
 
@@ -145,11 +146,18 @@ def solve_part_1(input: str) -> int:
     monkey_business = activity[0] * activity[1]
     return monkey_business
 
+def product(factors: Sequence[int]):
+    acc = 1
+    for f in factors:
+        acc *= f
+    return acc
+
 def solve_part_2(input: str) -> int:
     monkeys = parse_input(input)
+    max_worry = product(m.test_divisor for m in monkeys)
     monkeys_by_id = { m.id: m for m in monkeys}
     monkey_activity = { m.id: 0 for m in monkeys }
-    for _ in range(500):
+    for _ in range(10000):
         for monkey in monkeys:
             monkey.items.reverse()
             while monkey.items:
@@ -160,6 +168,7 @@ def solve_part_2(input: str) -> int:
                     None,            # globals
                     { "old": worry }  # locals
                 )
+                worry = worry % max_worry
                 divisible = worry % monkey.test_divisor == 0
                 if divisible:
                     other_monkey_id = monkey.test_true_monkey_id
@@ -171,7 +180,6 @@ def solve_part_2(input: str) -> int:
     monkey_business = activity[0] * activity[1]
     return monkey_business
 
-
 def test_solve_part_1_example():
     assert solve_part_1(example_input) == 10_605
 
@@ -181,3 +189,7 @@ def test_solve_part_1_actual():
 
 def test_solve_part_2_example():
     assert solve_part_2(example_input) == 2713310158
+
+def test_solve_part_2_actual():
+    input = utils.read_text("d11_input.txt")
+    assert solve_part_2(input) == 14106266886
