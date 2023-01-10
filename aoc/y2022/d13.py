@@ -1,4 +1,5 @@
 import pytest
+import functools
 
 from typing import Union
 
@@ -139,9 +140,48 @@ def solve_part_1(input: str) -> int:
             indices.append(i + 1)
     return sum(indices)
 
+@functools.total_ordering
+class Packet:
+    def __init__(self, value):
+        self.value = value
+    
+    def __lt__(self, other):
+        if not isinstance(other, type(self)):
+            raise NotImplemented
+        return compare(self.value, other.value)
+
+def solve_part_2(input: str) -> int:
+    pairs = parse_input(input)
+    packets = []
+    dividers = ([[2]], [[6]])
+    for a, b in pairs:
+        packets.append(a)
+        packets.append(b)
+    packets.extend(dividers)
+    packets.sort(key=Packet)
+    index = None
+    decoder_key = None
+    for k, packet in enumerate(packets):
+        current_index = k + 1
+        if packet in dividers:
+            if index is None:
+                index = current_index
+            else:
+                decoder_key = index * current_index
+                break
+    assert decoder_key is not None
+    return decoder_key
+
 def test_solve_part_1_example_input():
     assert solve_part_1(example_input) == 13
 
 def test_solve_part_1_actual_input():
     actual_input = utils.read_text("d13_input.txt")
     assert solve_part_1(actual_input) == 6484
+
+def test_solve_part_2_example_input():
+    assert solve_part_2(example_input) == 140
+
+def test_solve_part_2_actual_input():
+    actual_input = utils.read_text("d13_input.txt")
+    assert solve_part_2(actual_input) == 19305
