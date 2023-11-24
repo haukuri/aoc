@@ -11,8 +11,8 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    working-directory: ./py
 
     steps:
     - uses: actions/checkout@v2
