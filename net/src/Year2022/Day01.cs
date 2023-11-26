@@ -1,54 +1,49 @@
 ﻿namespace AdventOfCode.Year2022
 {
-    public class Day01 : ISolution<Day01Solution>
+    public class Day01
     {
-        public Day01Solution Solve(TextReader reader)
+        public static int SolvePart01(TextReader reader)
         {
-            var currentCalories = 0;
-            var maxCalories = 0;
-            var maxCalorieHolder = 0;
-            var elfNumber = 1;
+            var caloriesPerElf = CaloriesPerElf(reader);
+            caloriesPerElf.Sort();
+            return caloriesPerElf[caloriesPerElf.Count - 1];
+        }
 
+        public static int SolvePart02(TextReader reader)
+        {
+            var caloriesPerElf = CaloriesPerElf(reader);
+            caloriesPerElf.Sort();
+            var sum = 0;
+            for (int i = 0; i < 3; i++)
+            {
+                var index = caloriesPerElf.Count - 1 - i;
+                sum += caloriesPerElf[index];
+            }
+            return sum;
+        }
+
+        private static List<int> CaloriesPerElf(TextReader reader)
+        {
+            var result = new List<int>();
+            var calories = 0;
             foreach (var line in reader.IterLines())
             {
                 if (string.IsNullOrEmpty(line))
                 {
-                    currentCalories = 0;
-                    elfNumber++;
+                    // new elf
+                    result.Add(calories);
+                    calories = 0;
                 }
                 else
                 {
-                    currentCalories += Convert.ToInt32(line);
-                    if (currentCalories > maxCalories)
-                    {
-                        maxCalories = currentCalories;
-                        maxCalorieHolder = elfNumber;
-                    }
+                    calories += Convert.ToInt32(line);
                 }
             }
-
-            var solution = new Day01Solution(maxCalories, maxCalorieHolder);
-            return solution;
-        }
-    }
-
-    public record Day01Solution(int MaxCalories, int ElfNumber);
-
-    public interface ISolution<T>
-    {
-        T Solve(TextReader reader);
-    }
-
-    public static class TextReaderExtensions
-    {
-        public static IEnumerable<string> IterLines(this TextReader reader)
-        {
-            while (true)
+            if (calories > 0)
             {
-                var line = reader.ReadLine();
-                if (line == null) break;
-                yield return line;
+                result.Add(calories);
             }
+            return result;
         }
     }
 }

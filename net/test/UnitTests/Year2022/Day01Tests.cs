@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace AdventOfCode.Year2022
+﻿namespace AdventOfCode.Year2022
 {
     [TestClass]
     public class Day01Tests
@@ -9,26 +7,38 @@ namespace AdventOfCode.Year2022
         [TestMethod]
         public void TestPart1WithExampleInput()
         {
-            var solver = new Day01();
             var reader = TestDataReader.Read("Y2023D01P01E.txt");
-            var solution = solver.Solve(reader);
+            var solution = Day01.SolvePart01(reader);
 
-            Assert.AreEqual(4, solution.ElfNumber);
-            Assert.AreEqual(24_000, solution.MaxCalories);
+            Assert.AreEqual(24_000, solution);
         }
 
-    }
-
-    public class TestDataReader
-    {
-        public static TextReader Read(string name)
+        [TestMethod]
+        public void TestPart1WithActualInput()
         {
-            var assemblyPath = Assembly.GetExecutingAssembly().Location;
-            var assemblyDirectory = Path.GetDirectoryName(assemblyPath)!;
-            var testDataFolder = Path.Combine(assemblyDirectory, "TestData");
-            var filePath = Path.Combine(testDataFolder, name);
-            var reader = new StreamReader(filePath);
-            return reader;
+            var reader = TestDataReader.Read("Y2023D01.txt");
+            var solution = Day01.SolvePart01(reader);
+
+            Assert.AreEqual(71124, solution);
         }
+
+        [TestMethod]
+        public void TestPart2WithExampleInput()
+        {
+            var reader = TestDataReader.Read("Y2023D01P01E.txt");
+            var solution = Day01.SolvePart02(reader);
+
+            Assert.AreEqual(45_000, solution);
+        }
+
+        [TestMethod]
+        public void TestPart2WithActualInput()
+        {
+            var reader = TestDataReader.Read("Y2023D01.txt");
+            var solution = Day01.SolvePart02(reader);
+
+            Assert.AreEqual(204_639, solution);
+        }
+
     }
 }
